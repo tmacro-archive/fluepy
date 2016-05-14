@@ -1,0 +1,12 @@
+{
+	"APP_NAME": "fluepy",
+	"LOGLVL": "debug",
+	"ETCD_HOST": "infra1.drafty",
+	"ETCD_PORT": 2379,
+	"ETCD_ROOT_KEY": "/stagecoach",
+	"DNS_HOST": "chimney.drafty",
+	"RNDC_KEY": {"rndc-key": "INSERT_KEY"},
+	"POLL_TIME": 10,
+	"RECORD_TTL": 3600,
+	"DNS_ZONE": "drafty"
+}
