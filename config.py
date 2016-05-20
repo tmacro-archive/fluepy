@@ -13,6 +13,11 @@ BUILT_IN_DEFAULTS = { # These can be overridden in the config file. They are jus
 			"DEBUGGING" : False,
 }
 
+def injectIntoModule(**kwargs):
+	configModule = sys.modules[__name__]
+	for key, value in kwargs.items():
+		configModule.__dict__[key] = value
+
 def parseLogLevel(text, default = 30):
 	text = text.lower()
 	levelValues = {
@@ -43,6 +48,16 @@ def setupLogging():
 
 	logging.basicConfig(**args)
 	logging.info('Starting %s: version %s'%(APP_NAME, VERSION))
+	baselogger = logging.getLogger(APP_NAME)
+	injectIntoModule(BASE_LOGGER=baselogger)
+
+def getLogger(name):
+	configModule = sys.modules[__name__]
+	baselogger = configModule.__dict__.get('BASE_LOGGER', None)
+	if baselogger:
+		return baselogger.getChild(name)
+	else:
+		return logging.getLogger(name)
 
 def loadConfig(file = 'config.json'):
 	with open(file) as configFile:
@@ -55,12 +70,8 @@ def loadConfig(file = 'config.json'):
 	config['LOGLVL'] = parseLogLevel(config['LOGLVL']) # Parse the loglvl
 	if config['LOGLVL'] <= 10:
 		config['DEBUGGING'] = True
-	configModule = sys.modules[__name__]	# This is pretty hacky but it works...
-
 	# Set the config values to their respective keys
-	for key, value in config.items():
-		configModule.__dict__[key] = value	# Dirty Hacks
-
+	injectIntoModule(**config)
 	return config # Return the config for good measure
 
 def loadFromEnv(config):
