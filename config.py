@@ -1,12 +1,14 @@
 import json
 import sys
 import logging
+import logging.handlers
 import os
 
 BUILT_IN_DEFAULTS = { # These can be overridden in the config file. They are just here so that you don't HAVE to define them and the module still works
 			"VERSION": "DEV_BUILD",
 			"APP_NAME" : "UNKNOWN",
 			"LOGFILE" : None,
+			"LOG_ROTATION": False,
 			"LOGLVL" : "DEBUG",
 			"LOGFMT" : '%(asctime)s %(name)s %(levelname)s: %(message)s',
 			"DATEFMT" : '%d-%m-%y %I:%M:%S %p',
@@ -30,26 +32,42 @@ def parseLogLevel(text, default = 30):
 	return levelValues.get(text, default)
 
 def setupLogging():
-	try:
-		if not LOGFILE:
-			LOGFILE = None
-	except Exception as e:
-		LOGFILE = None
+	# try:
+	# 	if not LOGFILE:
+	# 		LOGFILE = None
+	# except Exception as e:
+	# 	LOGFILE = None
 
 	args = {
 		'level':LOGLVL,
 		'format':LOGFMT,
 		'datefmt':DATEFMT,
 	}
-	if LOGFILE:
-		args['filename'] = LOGFILE
-	else:
-		args['stream'] = sys.stderr
 
-	logging.basicConfig(**args)
+	rootLogger = logging.getLogger()
+	rootLogger.setLevel(LOGLVL)
+
+	formatter = logging.Formatter(fmt=LOGFMT, datefmt=DATEFMT)
+
+	streamHandler = logging.StreamHandler()
+	streamHandler.setFormatter(formatter)
+
+	rootLogger.addHandler(streamHandler)
+
+	if LOGFILE:
+		if LOG_ROTATION:
+			handler = logging.handlers.RotatingFileHandler(
+            	LOGFILE, maxBytes=10*1024*1024, backupCount=2)
+		else:
+			handler = logging.FileHandler(LOGFILE)
+
+		handler.setFormatter(formatter)
+		rootLogger.addHandler(handler)
+
+	# logging.basicConfig(**args)
 	logging.info('Starting %s: version %s'%(APP_NAME, VERSION))
-	baselogger = logging.getLogger(APP_NAME)
-	injectIntoModule(BASE_LOGGER=baselogger)
+	baseLogger = logging.getLogger(APP_NAME)
+	injectIntoModule(BASE_LOGGER=baseLogger)
 
 def getLogger(name):
 	configModule = sys.modules[__name__]
