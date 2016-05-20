@@ -7,10 +7,10 @@ moduleLogger = config.getLogger('ddns')
 
 
 def loadKey():
-	if isinstance(config.RNDC_KEY, dict):
+	try:
 		return dns.tsigkeyring.from_text(config.RNDC_KEY)
-	else:
-		raise Exception('Invalid tsig key')
+	except:
+		raise Exception('Error loading tsig key')
 
 
 def updateDNS(services, removed):
