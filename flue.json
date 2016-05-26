@@ -1,11 +1,14 @@
 {
 	"APP_NAME": "fluepy",
+	"VERSION": "0.1.0",
 	"LOGLVL": "debug",
-	"ETCD_HOST": "infra1.drafty",
+	"LOGFILE":"flue.log",
+	"LOG_ROTATION": true,
+	"ETCD_HOST": "ETCD_HOST_GOES_HERE",
 	"ETCD_PORT": 2379,
 	"ETCD_ROOT_KEY": "/stagecoach",
-	"DNS_HOST": "chimney.drafty",
-	"RNDC_KEY": {"rndc-key": "INSERT_KEY"},
+	"DNS_HOST": "HOSTNAME_OF_DNS_SERVER",
+	"RNDC_KEY": {"KEY_NAME": "KEY_GOES_HERE"},
 	"POLL_TIME": 10,
 	"RECORD_TTL": 3600,
 	"DNS_ZONE": "drafty"
